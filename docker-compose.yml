@@ -1,0 +1,158 @@
+volumes:
+  postgres-data:
+  vscode-extensions:
+  vscode-insiders-extensions:
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    volumes:
+      # We'll store the postgres data in the 'postgres_data' volume we defined:
+      - type: volume
+        source: postgres-data
+        target: /var/lib/postgresql/data
+
+      - ./db/dumps:/db/dumps
+      - ./bin/dumpdb:/usr/local/bin/dumpdb:ro
+      - ./bin/restoredb:/usr/local/bin/restoredb:ro
+    ports:
+      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_PG_PORT:-5432}
+        target: 5432
+    environment:
+      POSTGRES_USER: ${USER:-you}
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+    # See https://docs.docker.com/compose/profiles/
+    # profiles:
+    #   - ci
+    #   - testing
+    #   - staging
+    #   - development
+
+  chrome:
+    image: icalialabs/chromium:93.0.4577.82
+    ports:
+      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_CHROME_WEB_PORT:-9222}
+        target: 9222
+    # Mount application source code to support file uploading
+    # (otherwise Chrome won't be able to find files).
+    # NOTE: Make sure you use absolute paths in `#attach_file`.
+    volumes:
+      - type: bind
+        source: .
+        target: /workspaces/rails-google-cloud-quickstart
+    environment:
+      PORT: 9222
+      # Set connection timeout to avoid timeout exception during debugging
+      # https://docs.browserless.io/docs/docker.html#connection-timeout
+      CONNECTION_TIMEOUT: 600000
+
+    # profiles:
+    #   - ci
+    #   - testing
+    #   - development
+
+  # The tests container:
+  tests: &app
+    build: &app-build
+      context: .
+      dockerfile: Dockerfile
+      target: development #testing
+      args:
+        DEVELOPER_UID: ${UID:-1000}
+        DEVELOPER_USERNAME: ${USER:-you}
+    image: icalialabs/rails-google-cloud-quickstart${TESTING_IMAGE_TAG:-:testing}
+
+    volumes:
+      # Mount the app code into the app containers:
+      - .:/workspaces/rails-google-cloud-quickstart
+
+    # Keep the stdin open, so we can attach to our app container's process
+    # and do things such as byebug, etc:
+    stdin_open: true
+
+    # Enable sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container:
+    tty: true
+
+    # Required for ptrace-based debuggers like C++, Go, and Rust
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+    security_opt:
+      - seccomp:unconfined
+
+    entrypoint: /workspaces/rails-google-cloud-quickstart/bin/dev-entrypoint
+
+    # Link to our postgres and redis services, so they can be visible from our
+    # app service containers:
+    depends_on:
+      - chrome
+      - postgres
+
+    # The command we want to execute by default when running the container
+    command: rspec
+
+    # Specify environment variables available for our app containers. We'll
+    # leave a YML anchor in case we need to override or add more variables if
+    # needed on each app service:
+    environment: &app-env
+      RAILS_LOG_TO_STDOUT: "true"
+
+      DEBIAN_FRONTEND: dialog
+
+      # Tells the test suite to use the "chrome" service instead of a local
+      # chrome install:
+      CHROME_URL: http://chrome:9222
+      CHROME_PUBLIC_URL: ${RAILS_GOOGLE_CLOUD_QUICKSTART_CHROME_PUBLIC_URL:-http://localhost:9222}
+
+      DATABASE_URL: postgres://postgres:5432/?encoding=unicode
+
+      GOOGLE_CLOUD_PROJECT: rails-google-cloud-quickstart
+
+    # profiles:
+    #   - ci
+    #   - testing
+
+  # The Visual Studio Code / GitHub Codespaces development container:
+  devcontainer:
+    <<: *app
+    build:
+      <<: *app-build
+      target: development
+
+    volumes:
+      - .:/workspaces/rails-google-cloud-quickstart
+      - vscode-extensions:/home/${USER:-you}/.vscode-server/extensions
+      - vscode-insiders-extensions:/home/${USER:-you}/.vscode-server-insiders/extensions
+
+    image: icalialabs/rails-google-cloud-quickstart:development
+
+    # The command we want to execute by default when running the container
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+    environment:
+      <<: *app-env
+
+      EDITOR: code --wait
+
+    # profiles:
+    #   - development
+
+  # The releasable container:
+  web-staging:
+    <<: *app
+    build:
+      <<: *app-build
+      target: release
+    ports:
+      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_WEB_PORT:-3000}
+        target: 3000
+
+    depends_on:
+      - postgres
+    environment:
+      <<: *app-env
+      DATABASE_URL: postgres://${USER:-you}@postgres:5432/rails_google_cloud_quickstart_development?encoding=unicode
+
+    # profiles:
+    #   - staging
