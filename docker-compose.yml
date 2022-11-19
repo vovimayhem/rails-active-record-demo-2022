@@ -16,7 +16,7 @@ services:
       - ./bin/dumpdb:/usr/local/bin/dumpdb:ro
       - ./bin/restoredb:/usr/local/bin/restoredb:ro
     ports:
-      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_PG_PORT:-5432}
+      - published: ${RAILS_ACTIVE_RECORD_DEMO_2022_PG_PORT:-5432}
         target: 5432
     environment:
       POSTGRES_USER: ${USER:-you}
@@ -32,7 +32,7 @@ services:
   chrome:
     image: icalialabs/chromium:93.0.4577.82
     ports:
-      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_CHROME_WEB_PORT:-9222}
+      - published: ${RAILS_ACTIVE_RECORD_DEMO_2022_CHROME_WEB_PORT:-9222}
         target: 9222
     # Mount application source code to support file uploading
     # (otherwise Chrome won't be able to find files).
@@ -40,7 +40,7 @@ services:
     volumes:
       - type: bind
         source: .
-        target: /workspaces/rails-google-cloud-quickstart
+        target: /workspaces/rails-active-record-demo-2022
     environment:
       PORT: 9222
       # Set connection timeout to avoid timeout exception during debugging
@@ -61,11 +61,11 @@ services:
       args:
         DEVELOPER_UID: ${UID:-1000}
         DEVELOPER_USERNAME: ${USER:-you}
-    image: icalialabs/rails-google-cloud-quickstart${TESTING_IMAGE_TAG:-:testing}
+    image: icalialabs/rails-active-record-demo-2022${TESTING_IMAGE_TAG:-:testing}
 
     volumes:
       # Mount the app code into the app containers:
-      - .:/workspaces/rails-google-cloud-quickstart
+      - .:/workspaces/rails-active-record-demo-2022
 
     # Keep the stdin open, so we can attach to our app container's process
     # and do things such as byebug, etc:
@@ -81,7 +81,7 @@ services:
     security_opt:
       - seccomp:unconfined
 
-    entrypoint: /workspaces/rails-google-cloud-quickstart/bin/dev-entrypoint
+    entrypoint: /workspaces/rails-active-record-demo-2022/bin/dev-entrypoint
 
     # Link to our postgres and redis services, so they can be visible from our
     # app service containers:
@@ -103,11 +103,11 @@ services:
       # Tells the test suite to use the "chrome" service instead of a local
       # chrome install:
       CHROME_URL: http://chrome:9222
-      CHROME_PUBLIC_URL: ${RAILS_GOOGLE_CLOUD_QUICKSTART_CHROME_PUBLIC_URL:-http://localhost:9222}
+      CHROME_PUBLIC_URL: ${RAILS_ACTIVE_RECORD_DEMO_2022_CHROME_PUBLIC_URL:-http://localhost:9222}
 
       DATABASE_URL: postgres://postgres:5432/?encoding=unicode
 
-      GOOGLE_CLOUD_PROJECT: rails-google-cloud-quickstart
+      GOOGLE_CLOUD_PROJECT: rails-active-record-demo-2022
 
     # profiles:
     #   - ci
@@ -121,11 +121,11 @@ services:
       target: development
 
     volumes:
-      - .:/workspaces/rails-google-cloud-quickstart
+      - .:/workspaces/rails-active-record-demo-2022
       - vscode-extensions:/home/${USER:-you}/.vscode-server/extensions
       - vscode-insiders-extensions:/home/${USER:-you}/.vscode-server-insiders/extensions
 
-    image: icalialabs/rails-google-cloud-quickstart:development
+    image: icalialabs/rails-active-record-demo-2022:development
 
     # The command we want to execute by default when running the container
     command: /bin/sh -c "while sleep 1000; do :; done"
@@ -145,14 +145,14 @@ services:
       <<: *app-build
       target: release
     ports:
-      - published: ${RAILS_GOOGLE_CLOUD_QUICKSTART_WEB_PORT:-3000}
+      - published: ${RAILS_ACTIVE_RECORD_DEMO_2022_WEB_PORT:-3000}
         target: 3000
 
     depends_on:
       - postgres
     environment:
       <<: *app-env
-      DATABASE_URL: postgres://${USER:-you}@postgres:5432/rails_google_cloud_quickstart_development?encoding=unicode
+      DATABASE_URL: postgres://${USER:-you}@postgres:5432/demo_development?encoding=unicode
 
     # profiles:
     #   - staging

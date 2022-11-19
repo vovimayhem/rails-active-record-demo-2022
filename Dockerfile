@@ -53,15 +53,15 @@ RUN addgroup --gid ${DEVELOPER_UID} ${DEVELOPER_USERNAME} \
 # (A workaround to a side effect of setting WORKDIR before creating the user)
 RUN userhome=$(eval echo ~${DEVELOPER_USERNAME}) \
  && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} $userhome \
- && mkdir -p /workspaces/rails-google-cloud-quickstart \
- && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} /workspaces/rails-google-cloud-quickstart \
+ && mkdir -p /workspaces/rails-active-record-demo-2022 \
+ && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} /workspaces/rails-active-record-demo-2022 \
  && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} /usr/local/bundle/*
 
 # Add the app's "bin/" directory to PATH:
-ENV PATH=/workspaces/rails-google-cloud-quickstart/bin:$PATH
+ENV PATH=/workspaces/rails-active-record-demo-2022/bin:$PATH
 
 # Set the app path as the working directory:
-WORKDIR /workspaces/rails-google-cloud-quickstart
+WORKDIR /workspaces/rails-active-record-demo-2022
 
 # Change to the developer user:
 USER ${DEVELOPER_USERNAME}
@@ -78,7 +78,7 @@ RUN bundle config set --local jobs 2
 FROM development-base AS testing
 
 # Copy the project's Gemfile and Gemfile.lock files:
-COPY --chown=${DEVELOPER_USERNAME} Gemfile* /workspaces/rails-google-cloud-quickstart/
+COPY --chown=${DEVELOPER_USERNAME} Gemfile* /workspaces/rails-active-record-demo-2022/
 
 # Configure bundler to exclude the gems from the "development" group when
 # installing, so we get the leanest Docker image possible to run tests:
@@ -144,7 +144,7 @@ USER ${DEVELOPER_USERNAME}
 
 # Copy the gems installed in the "testing" stage:
 COPY --from=testing /usr/local/bundle /usr/local/bundle
-COPY --from=testing /workspaces/rails-google-cloud-quickstart/ /workspaces/rails-google-cloud-quickstart/
+COPY --from=testing /workspaces/rails-active-record-demo-2022/ /workspaces/rails-active-record-demo-2022/
 
 # Configure bundler to not exclude any gem group, so we now get all the gems
 # specified in the Gemfile:
@@ -167,7 +167,7 @@ ARG DEVELOPER_USERNAME=you
 ARG DEVELOPER_USERNAME=you
 
 # Copy the full contents of the project:
-COPY --chown=${DEVELOPER_USERNAME} . /workspaces/rails-google-cloud-quickstart/
+COPY --chown=${DEVELOPER_USERNAME} . /workspaces/rails-active-record-demo-2022/
 
 # Compile the assets:
 RUN RAILS_ENV=production SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails assets:precompile
@@ -230,14 +230,14 @@ FROM runtime AS release
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 
 # Copy the app code and compiled assets from the "builder" stage to the
-# final destination at /workspaces/rails-google-cloud-quickstart:
-COPY --from=builder --chown=nobody:nogroup /workspaces/rails-google-cloud-quickstart /workspaces/rails-google-cloud-quickstart
+# final destination at /workspaces/rails-active-record-demo-2022:
+COPY --from=builder --chown=nobody:nogroup /workspaces/rails-active-record-demo-2022 /workspaces/rails-active-record-demo-2022
 
 # Set the container user to 'nobody':
 USER nobody
 
 # Set the RAILS and PORT default values:
-ENV HOME=/workspaces/rails-google-cloud-quickstart \
+ENV HOME=/workspaces/rails-active-record-demo-2022 \
     RAILS_ENV=production \
     RAILS_FORCE_SSL=yes \
     RAILS_LOG_TO_STDOUT=yes \
@@ -248,10 +248,10 @@ ENV HOME=/workspaces/rails-google-cloud-quickstart \
 RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 
 # Set the installed app directory as the working directory:
-WORKDIR /workspaces/rails-google-cloud-quickstart
+WORKDIR /workspaces/rails-active-record-demo-2022
 
 # Set the entrypoint script:
-ENTRYPOINT [ "/workspaces/rails-google-cloud-quickstart/bin/entrypoint" ]
+ENTRYPOINT [ "/workspaces/rails-active-record-demo-2022/bin/entrypoint" ]
 
 # Set the default command:
 CMD [ "puma" ]

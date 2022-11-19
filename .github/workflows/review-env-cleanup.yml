@@ -29,7 +29,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1.0.0
         with:
-          service_account: github-actions-runner@rails-google-cloud-quickstart.iam.gserviceaccount.com
+          service_account: github-actions-runner@rails-active-record-demo-2022.iam.gserviceaccount.com
           workload_identity_provider: projects/000000000000/locations/global/workloadIdentityPools/devops/providers/github
 
       - name: Set up gcloud Cloud SDK environment
@@ -38,7 +38,7 @@ jobs:
       - name: Remove the deployed service from Cloud Run
         run: |-
           gcloud run services delete \
-            rails-google-cloud-quickstart-pr${{ github.event.pull_request.number }} \
+            rails-active-record-demo-2022-pr${{ github.event.pull_request.number }} \
             --quiet \
             --platform=managed \
             --region=us-central1
@@ -46,7 +46,7 @@ jobs:
       - name: Drop the review database
         run: |-
           gcloud sql databases delete \
-            rails_google_cloud_quickstart_pr${{ github.event.pull_request.number }} \
+            demo_pr${{ github.event.pull_request.number }} \
             --quiet \
             --instance=pg-fourteen-a
 

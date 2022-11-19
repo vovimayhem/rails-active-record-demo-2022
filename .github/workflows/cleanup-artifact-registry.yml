@@ -25,7 +25,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1.0.0
         with:
-          service_account: github-actions-runner@rails-google-cloud-quickstart.iam.gserviceaccount.com
+          service_account: github-actions-runner@rails-active-record-demo-2022.iam.gserviceaccount.com
           workload_identity_provider: projects/000000000000/locations/global/workloadIdentityPools/devops/providers/github
 
       - name: Set up Google Cloud SDK
@@ -36,7 +36,7 @@ jobs:
         run: |-
           echo "::set-output name=digests::$(
             gcloud artifacts docker images list \
-            us-central1-docker.pkg.dev/rails-google-cloud-quickstart/rails-google-cloud-quickstart/rails-google-cloud-quickstart-app \
+            us-central1-docker.pkg.dev/rails-active-record-demo-2022/rails-active-record-demo-2022/rails-active-record-demo-2022-app \
             --filter="updateTime<$(date --date="7 days ago" --iso-8601=seconds) AND tags "'!'"~ [g-zG-Z]" \
             --format json \
             --include-tags | jq -r '.[].version')"
@@ -45,6 +45,6 @@ jobs:
         run: |-
           for row in $(echo "${{ steps.get-old-images.outputs.digests }}"); do
             gcloud artifacts docker images delete \
-              us-central1-docker.pkg.dev/rails-google-cloud-quickstart/rails-google-cloud-quickstart/rails-google-cloud-quickstart-app@${row} \
+              us-central1-docker.pkg.dev/rails-active-record-demo-2022/rails-active-record-demo-2022/rails-active-record-demo-2022-app@${row} \
               --async --delete-tags --quiet
           done

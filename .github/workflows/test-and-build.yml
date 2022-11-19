@@ -59,7 +59,7 @@ jobs:
             DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
             DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
           tags: |
-            icalialabs/rails-google-cloud-quickstart:testing-${{ steps.variables.outputs.git-dasherized-branch }}
+            icalialabs/rails-active-record-demo-2022:testing-${{ steps.variables.outputs.git-dasherized-branch }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -83,7 +83,7 @@ jobs:
       #   env:
       #     CC_TEST_REPORTER_ID: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       #   with:
-      #       command: after-build --coverage-input-type simplecov --prefix /workspaces/rails-google-cloud-quickstart
+      #       command: after-build --coverage-input-type simplecov --prefix /workspaces/rails-active-record-demo-2022
       #       version: "0.10.3"
 
       - name: Archive test logs and screenshots
@@ -99,7 +99,7 @@ jobs:
       # - name: Authenticate to Google Cloud
       #   uses: google-github-actions/auth@v1.0.0
       #   with:
-      #     service_account: github-actions-runner@rails-google-cloud-quickstart.iam.gserviceaccount.com
+      #     service_account: github-actions-runner@rails-active-record-demo-2022.iam.gserviceaccount.com
       #     workload_identity_provider: projects/000000000000/locations/global/workloadIdentityPools/devops/providers/github
 
       # - name: Set up Google Cloud SDK
@@ -120,8 +120,8 @@ jobs:
       #       DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
       #       DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
       #     tags: |
-      #       us-central1-docker.pkg.dev/rails-google-cloud-quickstart/rails-google-cloud-quickstart/rails-google-cloud-quickstart-app:${{ steps.variables.outputs.git-commit-short-sha }}
-      #       us-central1-docker.pkg.dev/rails-google-cloud-quickstart/rails-google-cloud-quickstart/rails-google-cloud-quickstart-app:${{ steps.variables.outputs.git-dasherized-branch }}
-      #       us-central1-docker.pkg.dev/rails-google-cloud-quickstart/rails-google-cloud-quickstart/rails-google-cloud-quickstart-app:latest
+      #       us-central1-docker.pkg.dev/rails-active-record-demo-2022/rails-active-record-demo-2022/rails-active-record-demo-2022-app:${{ steps.variables.outputs.git-commit-short-sha }}
+      #       us-central1-docker.pkg.dev/rails-active-record-demo-2022/rails-active-record-demo-2022/rails-active-record-demo-2022-app:${{ steps.variables.outputs.git-dasherized-branch }}
+      #       us-central1-docker.pkg.dev/rails-active-record-demo-2022/rails-active-record-demo-2022/rails-active-record-demo-2022-app:latest
       #     cache-from: type=gha
       #     cache-to: type=gha,mode=max

@@ -50,7 +50,7 @@ module IdentityPlatform
     end
 
     def self.expected_audience
-      ENV.fetch 'GOOGLE_CLOUD_PROJECT', 'rails-google-cloud-quickstart'
+      ENV.fetch 'GOOGLE_CLOUD_PROJECT', 'rails-active-record-demo-2022'
     end
 
     def self.expected_issuer

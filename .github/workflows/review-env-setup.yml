@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOOGLE_CLOUD_SQL_INSTANCE: postgres-dev-a
-      DB_NAME: "rails_google_cloud_quickstart_pr${{ github.event.pull_request.number }}"
+      DB_NAME: "demo_pr${{ github.event.pull_request.number }}"
 
     # Generate a GitHub token that can be exchanged with Google Cloud - see
     # https://github.com/google-github-actions/auth/tree/v0.6.0#setting-up-workload-identity-federation
@@ -30,7 +30,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1.0.0
         with:
-          service_account: github-actions-runner@rails-google-cloud-quickstart.iam.gserviceaccount.com
+          service_account: github-actions-runner@rails-active-record-demo-2022.iam.gserviceaccount.com
           workload_identity_provider: projects/000000000000/locations/global/workloadIdentityPools/devops/providers/github
 
       - name: Set up gcloud Cloud SDK environment
