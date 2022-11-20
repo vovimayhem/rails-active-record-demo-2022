@@ -20,12 +20,14 @@ class Employee < ApplicationRecord
            class_name: 'Employee',
            foreign_key: :ancestor_id
 
+  scope :top_level_managers, -> { where manager_id: nil }
+
   def as_scope
     self.class.where id:
   end
 
   def self.subordinates(manager_scope = nil)
-    manager_scope ||= Employee.where manager: nil
+    manager_scope ||= Employee.top_level_managers
 
     sql = <<~SQL
       WITH RECURSIVE "managers" AS (
