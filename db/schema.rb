@@ -10,8 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 0) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_19_033140) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "employees", force: :cascade do |t|
+    t.string "name"
+    t.bigint "manager_id"
+    t.index ["manager_id"], name: "index_employees_on_manager_id"
+  end
+
+  add_foreign_key "employees", "employees", column: "manager_id", name: "FK_employee_manager"
 end
