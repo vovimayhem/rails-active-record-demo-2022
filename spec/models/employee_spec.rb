@@ -38,4 +38,16 @@ RSpec.describe Employee, type: :model do
       expect(Employee.subordinates(example_manager_scope)).not_to include(example_manager)
     end
   end
+
+  describe '#as_scope' do
+    subject { create :employee }
+
+    it 'returns an ActiveRecord relation' do
+      expect(subject.as_scope).to be_a ActiveRecord::Relation
+    end
+
+    it 'contains self exclusively in the resultset' do
+      expect(subject.as_scope).to match_array([subject])
+    end
+  end
 end

@@ -15,6 +15,10 @@ class Employee < ApplicationRecord
            class_name: 'Employee',
            foreign_key: :manager_id
 
+  def as_scope
+    self.class.where id:
+  end
+
   def self.subordinates(manager_scope)
     manager_scope ||= Employee.where manager: nil
 
