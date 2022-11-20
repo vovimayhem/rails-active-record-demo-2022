@@ -37,6 +37,12 @@ RSpec.describe Employee, type: :model do
     it 'does not include the given manager(s) in the given scope' do
       expect(Employee.subordinates(example_manager_scope)).not_to include(example_manager)
     end
+
+    context 'when no manager scope is given' do
+      it 'returns all the subordinates for the root managers' do
+        expect(Employee.subordinates).to include(example_sub, example_sub_sub)
+      end
+    end
   end
 
   describe '#as_scope' do

@@ -15,11 +15,16 @@ class Employee < ApplicationRecord
            class_name: 'Employee',
            foreign_key: :manager_id
 
+  has_many :subordinates,
+           ->(employee) { subordinates(employee.as_scope) },
+           class_name: 'Employee',
+           foreign_key: :ancestor_id
+
   def as_scope
     self.class.where id:
   end
 
-  def self.subordinates(manager_scope)
+  def self.subordinates(manager_scope = nil)
     manager_scope ||= Employee.where manager: nil
 
     sql = <<~SQL
