@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :employee do
-    sequence(:full_name) { |n| "Example Employee #{n}" }
+    sequence(:name) { |n| "Example Employee #{n}" }
   end
 end

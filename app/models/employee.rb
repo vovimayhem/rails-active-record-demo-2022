@@ -14,4 +14,25 @@ class Employee < ApplicationRecord
            inverse_of: :manager,
            class_name: 'Employee',
            foreign_key: :manager_id
+
+  def self.subordinates(manager_scope)
+    manager_scope ||= Employee.where manager: nil
+
+    sql = <<~SQL
+      WITH RECURSIVE "managers" AS (
+        #{manager_scope.to_sql}
+      ), "managers_and_subordinates" AS (
+        SELECT *, "id" AS "ancestor_id" FROM "managers"
+        UNION
+        SELECT "e"."id", "e"."name", "e"."manager_id", "s"."ancestor_id"
+        FROM "employees" AS "e"
+        INNER JOIN "managers_and_subordinates" AS "s" ON "s"."id" = "e"."manager_id"
+      ) SELECT "managers_and_subordinates".*
+      FROM "managers_and_subordinates"
+      WHERE "id" != "ancestor_id"
+      ORDER BY "ancestor_id", "manager_id", "id"
+    SQL
+
+    from "(#{sql}) AS \"employees\""
+  end
 end
